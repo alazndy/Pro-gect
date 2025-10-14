@@ -11,7 +11,7 @@ const ServerIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => ( <svg {.
 const CloudIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => ( <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15a4.5 4.5 0 004.5 4.5H18a3.75 3.75 0 001.332-7.257 3 3 0 00-2.087-5.022 3.75 3.75 0 00-6.65-1.49l-.5 2.5a3.75 3.75 0 00-6.65 1.49v.195a4.5 4.5 0 004.5 4.5h.75" /></svg> );
 const UserIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => ( <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg> );
 
-const NODE_ICONS: { [key: string]: React.FC<any> } = {
+const NODE_ICONS: { [key: string]: React.FC<React.SVGProps<SVGSVGElement>> } = {
     user: UserIcon,
     frontend: CloudIcon,
     api: ServerIcon,

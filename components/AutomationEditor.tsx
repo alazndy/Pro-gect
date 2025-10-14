@@ -1,21 +1,23 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import type { Automation, Integration, AutomationNode, Task } from '../types.ts';
+import type { Automation, AutomationNode, Task } from '../types.ts';
 import NodePalette from './NodePalette.tsx';
 import AutomationNodeComponent from './AutomationNodeComponent.tsx';
 import AutomationSettingsPanel from './AutomationSettingsPanel.tsx';
 import { ALL_AVAILABLE_NODES } from '../constants.tsx';
+import model from '../gemini.ts'; // Import the Gemini model
 
 interface AutomationEditorProps {
     automation: Automation;
-    projectIntegrations: Integration[];
+    
     onUpdate: (automationId: string, updatedAutomation: Automation) => void;
     onAddTasks: (tasks: Omit<Task, 'id'>[]) => void;
 }
 
-const AutomationEditor: React.FC<AutomationEditorProps> = ({ automation, projectIntegrations, onUpdate, onAddTasks }) => {
+const AutomationEditor: React.FC<AutomationEditorProps> = ({ automation, onUpdate, onAddTasks }) => {
     const [nodes, setNodes] = useState<AutomationNode[]>(automation.nodes);
-    const [edges, setEdges] = useState(automation.edges);
+    const [edges] = useState(automation.edges);
     const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(false); // Loading state for API calls
     const editorRef = useRef<HTMLDivElement>(null);
 
     const handleUpdate = useCallback(() => {
@@ -36,27 +38,42 @@ const AutomationEditor: React.FC<AutomationEditorProps> = ({ automation, project
         setNodes(currentNodes => [...currentNodes, newNode]);
     };
 
-    const handleUpdateNodeData = (nodeId: string, data: any) => {
+    const handleUpdateNodeData = (nodeId: string, data: { [key: string]: string }) => {
         setNodes(currentNodes => currentNodes.map(n => n.id === nodeId ? { ...n, data } : n));
     };
 
     const executeAction = async (node: AutomationNode) => {
-        switch (node.name) {
-            case 'AI Task Generator':
-                const goal = node.data.goal;
-                if (goal) {
-                    const newTasks: Omit<Task, 'id'>[] = [
-                        { title: `Research for '${goal}'`, completed: false, status: 'todo' },
-                        { title: `Design for '${goal}'`, completed: false, status: 'todo' },
-                        { title: `Implement '${goal}'`, completed: false, status: 'todo' },
-                        { title: `Test '${goal}'`, completed: false, status: 'todo' },
-                    ];
-                    onAddTasks(newTasks);
-                    alert(`Generated ${newTasks.length} tasks for goal: ${goal}`);
+        setIsLoading(true);
+        try {
+            switch (node.name) {
+                case 'AI Task Generator': {
+                    const goal = node.data.goal;
+                    if (goal) {
+                        const prompt = `Based on the goal "${goal}", generate a list of tasks to achieve it. Return the tasks as a JSON array of objects, where each object has a "title" (string) and "status" (string, e.g., 'todo'). Example: [{"title": "First task", "status": "todo"}, {"title": "Second task", "status": "todo"}]`;
+                        
+                        const result = await model.generateContent(prompt);
+                        const response = await result.response;
+                        const text = response.text();
+                        
+                        // Clean the response to get only the JSON part
+                        const jsonString = text.replace(/```json|```/g, '').trim();
+                        
+                        const newTasks = JSON.parse(jsonString);
+                        onAddTasks(newTasks.map((task: { title: string; status: string }) => ({ ...task, completed: false })));
+                        alert(`Generated ${newTasks.length} tasks for goal: ${goal}`);
+                    } else {
+                        alert("Please provide a goal for the AI Task Generator.");
+                    }
+                    break;
                 }
-                break;
-            default:
-                alert(`Action '${node.name}' is not implemented yet.`);
+                default:
+                    alert(`Action '${node.name}' is not implemented yet.`);
+            }
+        } catch (error) {
+            console.error("Error executing action:", error);
+            alert("Failed to execute action. Check the console for details.");
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -103,9 +120,10 @@ const AutomationEditor: React.FC<AutomationEditorProps> = ({ automation, project
             <div className="flex justify-end">
                 <button 
                     onClick={handleExecute}
-                    className="bg-green-600 hover:bg-green-500 text-white font-semibold rounded-lg px-4 py-2 transition-colors"
+                    disabled={isLoading}
+                    className="bg-green-600 hover:bg-green-500 text-white font-semibold rounded-lg px-4 py-2 transition-colors disabled:opacity-50"
                 >
-                    Run Automation
+                    {isLoading ? 'Running...' : 'Run Automation'}
                 </button>
             </div>
             <div className="flex-1 flex space-x-4 overflow-hidden">

@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import type { Task, User, Comment } from '../types.ts';
+import type { Task, User } from '../types.ts';
 import Card from './Card.tsx';
 import UserAvatar from './UserAvatar.tsx';
 import Tag from './Tag.tsx';

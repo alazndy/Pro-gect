@@ -99,7 +99,7 @@ export interface AutomationNode {
     group: string;
     icon: React.FC<React.SVGProps<SVGSVGElement>>;
     position: { x: number; y: number };
-    data: any;
+    data: { [key: string]: string };
 }
 
 export interface AutomationEdge {
@@ -127,7 +127,7 @@ export interface ArchitectureNode {
     name: string;
     position: { x: number, y: number };
     status: 'planned' | 'development' | 'deployed' | 'deprecated';
-    data?: any;
+    data?: { [key: string]: string };
 }
 
 export interface ArchitectureEdge {

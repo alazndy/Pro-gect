@@ -41,7 +41,7 @@ const AddExpenseForm: React.FC<{ onAdd: (expense: Omit<Expense, 'id'>) => void }
             <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Gider Adı" className="md:col-span-2 w-full bg-gray-200/60 dark:bg-gray-800/60 border border-gray-400 dark:border-gray-700 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" required />
             <input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="Tutar" className="w-full bg-gray-200/60 dark:bg-gray-800/60 border border-gray-400 dark:border-gray-700 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" required />
             <div className="flex items-center space-x-2">
-                 <select value={type} onChange={e => setType(e.target.value as any)} className="w-full bg-gray-200/60 dark:bg-gray-800/60 border border-gray-400 dark:border-gray-700 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500">
+                 <select value={type} onChange={e => setType(e.target.value as 'subscription' | 'one-time')} className="w-full bg-gray-200/60 dark:bg-gray-800/60 border border-gray-400 dark:border-gray-700 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500">
                     <option value="one-time">Tek Seferlik</option>
                     <option value="subscription">Abonelik</option>
                  </select>

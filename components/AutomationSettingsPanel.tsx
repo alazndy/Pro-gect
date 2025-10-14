@@ -1,10 +1,10 @@
 import React from 'react';
 import type { AutomationNode } from '../types';
-import Card from './Card';
+
 
 interface AutomationSettingsPanelProps {
     selectedNode: AutomationNode | null;
-    onUpdateNodeData: (nodeId: string, data: any) => void;
+    onUpdateNodeData: (nodeId: string, data: { [key: string]: string }) => void;
     onClose: () => void;
 }
 

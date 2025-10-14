@@ -1,54 +1,89 @@
-# Fusion AI Dashboard
+# Pro-Gect: Entegre Proje Yönetimi ve Otomasyon Platformu
 
-This is a comprehensive project management dashboard designed to integrate with AI for enhanced productivity and workflow automation. It provides a single, cohesive interface for managing tasks, budget, architecture, and automations.
+Pro-Gect, modern yazılım projelerinin ihtiyaç duyduğu tüm araçları tek bir çatı altında toplayan, entegre bir proje yönetimi ve iş akışı otomasyon platformudur. Bu platform, görev yönetiminden sistem mimarisi görselleştirmesine, bütçe takibinden güçlü otomasyon araçlarına kadar geniş bir yelpazede özellikler sunar.
 
-## Features
+## ✨ Temel Özellikler
 
-- **Project Management**: Create and manage projects with detailed information including scope, goals, and budget.
-- **Task Management**: A Kanban board, task lists, and detailed task views to keep track of your work.
-- **Financials**: A budget tracker with expense management.
-- **System Architecture**: Visualize your project's architecture with a graph-based editor.
-- **Automations**: Create custom workflows with triggers and actions to automate repetitive tasks.
-- **AI-Powered Task Generation**: Automatically generate tasks from high-level goals using the AI Task Generator in the automations.
-- **GitHub Integration**: Visualize your GitHub repository's file structure.
-- **User Management**: Invite and manage project members.
-- **Real-time Updates**: Built with Firebase for real-time data synchronization.
-- **Customizable Dashboard**: A central dashboard with various cards to get a quick overview of the project.
+- **Merkezi Proje Panosu (Dashboard):** Projelerinizin genel durumunu, görev ilerlemesini, bütçeyi ve daha fazlasını tek bir ekranda görün.
+- **Detaylı Görev Yönetimi:** Görevler, alt görevler, etiketler, atamalar ve yorumlar ile proje planınızı detaylandırın.
+- **Görsel Sistem Mimarisi:** **React Flow** entegrasyonu ile projelerinizin teknik mimarisini sürükle-bırak arayüzüyle çizin ve yönetin.
+- **Güçlü İş Akışı Otomasyonu:** Sektör standardı iki güçlü otomasyon aracını ( **n8n** ve **Node-RED** ) doğrudan arayüz içinden kullanın.
+- **API Odaklı Mimari:** Proje verilerinize n8n, Node-RED veya diğer harici servisler üzerinden güvenli bir şekilde erişim ve manipülasyon imkanı sunan bir REST API.
+- **Kişiselleştirilebilir Arayüz:** Açık ve koyu tema seçenekleri.
 
-## Getting Started
+## 🛠️ Mimarisi ve Kullandığı Teknolojiler
 
-### Prerequisites
+Pro-Gect, birbirinden ayrı ama birbiriyle konuşan servislerden oluşan modern bir mimariye sahiptir.
 
-- Node.js
-- npm or yarn
+1.  **Frontend (Arayüz):**
+    - **Framework:** React (Vite ile)
+    - **Dil:** TypeScript
+    - **Stil:** Tailwind CSS
+    - **Mimari Görselleştirme:** @xyflow/react (React Flow)
 
-### Installation
+2.  **Backend - Otomasyon (n8n):**
+    - **Platform:** n8n.io
+    - **Çalışma Ortamı:** Node.js
+    - **Açıklama:** Özellikle API'ler ve web servisleri arasında karmaşık iş akışları oluşturmak için kullanılır.
 
-1. Clone the repository:
-   ```sh
-   git clone https://github.com/alazndy/Pro-gect.git
-   ```
-2. Navigate to the project directory:
-   ```sh
-   cd Pro-gect
-   ```
-3. Install the dependencies:
-   ```sh
-   npm install
-   ```
+3.  **Backend - Otomasyon (Node-RED):**
+    - **Platform:** Node-RED
+    - **Çalışma Ortamı:** Node.js
+    - **Açıklama:** Olay güdümlü ve genel amaçlı otomasyonlar için esnek bir platform sunar.
 
-### Running the Application
+4.  **Backend - API Sunucusu:**
+    - **Framework:** Express.js
+    - **Dil:** TypeScript
+    - **Veritabanı Erişimi:** Firebase Admin SDK
+    - **Açıklama:** Frontend, n8n ve Node-RED arasında güvenli bir veri köprüsü görevi görür.
 
-To start the development server, run:
+5.  **Veritabanı ve Kimlik Doğrulama:**
+    - **Servis:** Google Firebase
+    - **Veritabanı:** Firestore
+    - **Kimlik Doğrulama:** Firebase Authentication (Google ile Giriş, Email/Şifre)
 
-```sh
-npm run dev
+## 🚀 Projeyi Çalıştırma
+
+Projenin tüm servislerini (Frontend, n8n, Node-RED, API Sunucusu) tek bir komutla başlatabilirsiniz.
+
+**Gereksinimler:**
+- Node.js (v18 veya üstü)
+- npm
+
+**Kurulum:**
+
+1.  Proje ana dizininde bağımlılıkları kurun:
+    ```bash
+    npm install
+    ```
+2.  Her bir backend servisinin bağımlılıklarını kurun:
+    ```bash
+    cd backend && npm install
+    cd ../backend-nodered && npm install
+    cd ../api-server && npm install
+    ```
+
+**Çalıştırma:**
+
+Proje ana dizinindeyken aşağıdaki komutu çalıştırın:
+
+```bash
+npm run start:all
 ```
 
-This will start the application on `http://localhost:5173` (or another port if 5173 is busy).
+Bu komut, `concurrently` aracılığıyla aşağıdaki sunucuları başlatacaktır:
+- **Frontend (Vite):** `http://localhost:5173`
+- **n8n Sunucusu:** `http://localhost:5678`
+- **Node-RED Sunucusu:** `http://localhost:1880`
+- **API Sunucusu:** `http://localhost:3001`
 
-## Technologies Used
+Uygulamaya erişmek için tarayıcınızda **`http://localhost:5173`** adresini açın.
 
-- **Frontend**: React, Vite, Tailwind CSS
-- **Backend**: Firebase (Firestore, Authentication)
-- **Languages**: TypeScript
+### İlk Kurulum Notları
+
+- **Node-RED Girişi:** "Automations" sayfasındaki Node-RED sekmesi ilk başta `401 Unauthorized` hatası verebilir. Giriş yapmak için yeni bir tarayıcı sekmesinde `http://localhost:1880` adresini açın ve aşağıdaki bilgilerle giriş yapın. Bu işlemden sonra uygulama içindeki arayüz de çalışacaktır.
+  - **Kullanıcı Adı:** `admin`
+  - **Şifre:** `pro-gect-nodered-password`
+
+- **Firebase Kurulumu:** API sunucusunun çalışması için `api-server` klasörü içine `serviceAccountKey.json` dosyanızı eklemeniz gerekmektedir. Detaylar için Firebase dokümantasyonunu inceleyin.
+- **Gemini API Kurulumu:** AI özelliklerinin çalışması için ana dizinde bir `.env` dosyası oluşturup `VITE_GEMINI_API_KEY=YOUR_API_KEY` şeklinde anahtarınızı eklemeniz gerekmektedir.

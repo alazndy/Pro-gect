@@ -5,7 +5,6 @@ import type { Project, User } from '../types.ts';
 import { USERS, INTEGRATION_CATEGORIES } from '../constants.tsx';
 import Card from './Card.tsx';
 import ProjectWizard from './ProjectWizard.tsx';
-// Fix: Added .tsx extension to import path.
 import ProjectInfoCard from './ProjectInfoCard.tsx';
 
 interface ProjectsProps {
@@ -33,7 +32,7 @@ const Projects: React.FC<ProjectsProps> = ({ projects, currentUser, onSelectProj
             documents: []
         });
         setIsWizardOpen(false);
-    }
+    };
 
     return (
         <div className="space-y-8">
@@ -53,6 +52,7 @@ const Projects: React.FC<ProjectsProps> = ({ projects, currentUser, onSelectProj
                         <p className="mt-2 font-semibold text-gray-800 dark:text-white">Yeni Proje Oluştur</p>
                     </div>
                 </Card>
+
                 {projects.map(project => (
                     <ProjectInfoCard 
                         key={project.id} 

@@ -1,9 +1,6 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import type { Project, User, Expense, Task, Comment, SmartGoals, Integration, Automation, Page } from './types.ts';
-import { initialProjects } from './initialData.ts';
-import { USERS, INTEGRATION_CATEGORIES } from './constants.tsx';
-
+import { ALL_INTEGRATIONS, INTEGRATION_CATEGORIES } from './constants.tsx';
 import Sidebar from './components/Sidebar.tsx';
 import Header from './components/Header.tsx';
 import LoginScreen from './components/LoginScreen.tsx';
@@ -17,11 +14,9 @@ import Integrations from './components/Integrations.tsx';
 import Documents from './components/Documents.tsx';
 import Automations from './components/Automations.tsx';
 import Architecture from './components/Architecture.tsx';
-
-import { auth, db } from './firebase'; // Import auth and db from your firebase config
+import { auth, db } from './firebase';
 import { onAuthStateChanged, signOut, User as FirebaseUser } from 'firebase/auth';
 import { doc, getDoc, setDoc, query, where, getDocs, collection, updateDoc, arrayUnion, onSnapshot, addDoc } from 'firebase/firestore';
-
 
 const App: React.FC = () => {
     const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -30,7 +25,6 @@ const App: React.FC = () => {
     const [currentPage, setCurrentPage] = useState<Page>('projects');
     const [theme, setTheme] = useState<'light' | 'dark'>('dark');
     const [dashboardView, setDashboardView] = useState('overview');
-    const [loadingAuth, setLoadingAuth] = useState(true);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: FirebaseUser | null) => {
@@ -48,14 +42,12 @@ const App: React.FC = () => {
                 }
                 setCurrentUser(user);
 
-                // Check for and process invitations
                 const invitationsQuery = query(collection(db, "invitations"), where("email", "==", userEmail), where("status", "==", "pending"));
                 const invitationsSnapshot = await getDocs(invitationsQuery);
 
                 for (const invDoc of invitationsSnapshot.docs) {
                     const invitation = invDoc.data();
                     const projectRef = doc(db, "projects", invitation.projectId);
-                    // Use dot notation to update the map
                     await updateDoc(projectRef, { 
                         [`members.${user.id}`]: invitation.role,
                         memberIds: arrayUnion(user.id)
@@ -63,11 +55,9 @@ const App: React.FC = () => {
                     await updateDoc(invDoc.ref, { status: 'accepted' });
                     alert(`You have been added to project: ${invitation.projectId}`)
                 }
-
             } else {
                 setCurrentUser(null);
             }
-            setLoadingAuth(false);
         });
         return () => unsubscribe();
     }, []);
@@ -77,14 +67,23 @@ const App: React.FC = () => {
             setProjects([]);
             return;
         }
-        // Fetch projects where the user is a member
+        
         const projectsRef = collection(db, 'projects');
         const q = query(projectsRef, where('memberIds', 'array-contains', currentUser.id));
 
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
             const userProjects: Project[] = [];
             querySnapshot.forEach((doc) => {
-                userProjects.push({ id: doc.id, ...doc.data() } as Project);
+                const projectData = doc.data() as Project;
+                
+                if (projectData.integrations) {
+                    projectData.integrations = projectData.integrations.map(dbInt => {
+                        const fullIntegration = ALL_INTEGRATIONS.find(constInt => constInt.id === dbInt.id);
+                        return fullIntegration ? { ...dbInt, icon: fullIntegration.icon } : dbInt;
+                    });
+                }
+                
+                userProjects.push({ id: doc.id, ...projectData });
             });
             setProjects(userProjects);
         });
@@ -110,16 +109,22 @@ const App: React.FC = () => {
         setProjects(projects.map(p => p.id === updatedProject.id ? updatedProject : p));
     };
     
-    const handleCreateProject = async (newProjectData: Omit<Project, 'id' | 'tasks' | 'architecture' | 'automations' | 'documents' >) => {
+    const handleCreateProject = async (newProjectData: Omit<Project, 'id'>) => {
         if (!currentUser) return;
 
-        const projectToSave = {
-            ...newProjectData,
-            tasks: [],
-            architecture: { nodes: [], edges: [] },
-            automations: [],
-            documents: [],
-        };
+        const projectToSave = JSON.parse(JSON.stringify(newProjectData));
+
+        projectToSave.tasks = projectToSave.tasks || [];
+        projectToSave.architecture = projectToSave.architecture || { nodes: [], edges: [] };
+        projectToSave.automations = projectToSave.automations || [];
+        projectToSave.documents = projectToSave.documents || [];
+        
+        if (projectToSave.integrations) {
+            projectToSave.integrations = projectToSave.integrations.map((integration: any) => {
+                const { icon, ...rest } = integration;
+                return rest;
+            });
+        }
 
         try {
             const docRef = await addDoc(collection(db, "projects"), projectToSave);
@@ -153,7 +158,6 @@ const App: React.FC = () => {
         return total > 0 ? (completed / total) * 100 : 0;
     }, [selectedProject]);
 
-    // Project specific handlers
     const onAddExpense = (expense: Omit<Expense, 'id'>) => {
         if (!selectedProject) return;
         const newExpense = { ...expense, id: `exp-${Date.now()}` };
@@ -232,7 +236,7 @@ const App: React.FC = () => {
     };
 
     const onAddSubtask = (parentId: string, title: string) => {
-        if (!selectedProject || !currentUser) return;
+        if (!selectedProject) return;
         const updater = (task: Task): Task => {
             if (task.id === parentId) {
                 const newSubtask: Task = { id: `task-${Date.now()}`, title, completed: false, status: 'todo', assignee: currentUser, comments: [], subtasks: [] };
@@ -266,30 +270,6 @@ const App: React.FC = () => {
         }));
         handleUpdateProject({ ...selectedProject, tasks: [...selectedProject.tasks, ...tasksToAdd] });
     };
-    
-    const onUpdateAutomation = (automationId: string, updatedAutomation: Automation) => {
-        if (!selectedProject) return;
-        const updatedAutomations = selectedProject.automations.map(a => a.id === automationId ? updatedAutomation : a);
-        handleUpdateProject({ ...selectedProject, automations: updatedAutomations });
-    };
-
-    const onCreateAutomation = (name: string, template?: Omit<Automation, 'id' | 'name'>) => {
-        if (!selectedProject) throw new Error("No project selected");
-        const newAutomation: Automation = {
-            id: `auto-${Date.now()}`,
-            name,
-            nodes: template?.nodes || [],
-            edges: template?.edges || [],
-        };
-        handleUpdateProject({ ...selectedProject, automations: [...selectedProject.automations, newAutomation] });
-        return newAutomation;
-    };
-    
-    const onDeleteAutomation = (automationId: string) => {
-        if (!selectedProject) return;
-        handleUpdateProject({ ...selectedProject, automations: selectedProject.automations.filter(a => a.id !== automationId) });
-    };
-
 
     const renderContent = () => {
         if (!selectedProject) {
@@ -327,14 +307,7 @@ const App: React.FC = () => {
                                         onAddDocument={(doc) => handleUpdateProject({...selectedProject, documents: [...selectedProject.documents, {...doc, id: `doc-${Date.now()}`, url:'#'}]})}
                                         onDeleteDocument={(docId) => handleUpdateProject({...selectedProject, documents: selectedProject.documents.filter(d => d.id !== docId)})}
                                      />
-            case 'automations': return <Automations
-                                        automations={selectedProject.automations}
-                                        projectIntegrations={selectedProject.integrations}
-                                        onUpdateAutomation={onUpdateAutomation}
-                                        onCreateAutomation={onCreateAutomation}
-                                        onDeleteAutomation={onDeleteAutomation}
-                                        onAddTasks={onAddTasks}
-                                       />
+            case 'automations': return <Automations />
             case 'architecture': return <Architecture project={selectedProject} onUpdateProject={handleUpdateProject} />;
             case 'settings': return <Settings user={currentUser!} currentTheme={theme} onThemeChange={setTheme} />;
             case 'projects':
@@ -364,7 +337,7 @@ const App: React.FC = () => {
                 <div className="flex-1 flex flex-col h-screen">
                     <main className="flex-1 p-8 overflow-y-auto">
                         <Header title={selectedProject ? selectedProject.name : "Projeler"} user={currentUser} />
-                        <div className="mt-8">
+                        <div className="mt-8 h-full">
                             {renderContent()}
                         </div>
                     </main>

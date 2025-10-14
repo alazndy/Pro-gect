@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 // Fix: Corrected module imports by removing file extensions.
-import type { Project, User, Task, Expense, Page } from './types.ts';
+import type { Project, User, Expense, Page } from './types.ts';
 import { USERS } from './constants.tsx';
 import TaskCard from './components/TaskCard.tsx';
 import BudgetCard from './components/BudgetCard.tsx';
@@ -21,7 +21,7 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 interface DashboardProps {
     project: Project;
     currentUser: User;
-    onUpdateProject: (updatedProject: Project) => void;
+    
     dashboardView: string;
     onSetDashboardView: (view: string) => void;
     onAddExpense: (expense: Omit<Expense, 'id'>) => void;
@@ -29,14 +29,14 @@ interface DashboardProps {
     onNavigate: (page: Page) => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ project, currentUser, onUpdateProject, dashboardView, onSetDashboardView, onAddExpense, onRemoveExpense, onNavigate }) => {
+const Dashboard: React.FC<DashboardProps> = ({ project, currentUser, dashboardView, onSetDashboardView, onAddExpense, onRemoveExpense, onNavigate }) => {
     const [isInviteModalOpen, setInviteModalOpen] = useState(false);
     const [inviteLoading, setInviteLoading] = useState(false);
-    const [inviteError, setInviteError] = useState<string | null>(null);
+    
 
     const handleInviteUser = async (email: string) => {
         setInviteLoading(true);
-        setInviteError(null);
+        
         try {
             const invitationsRef = collection(db, 'invitations');
             await addDoc(invitationsRef, {
@@ -50,8 +50,8 @@ const Dashboard: React.FC<DashboardProps> = ({ project, currentUser, onUpdatePro
 
             alert(`Invitation sent to ${email}!`);
             setInviteModalOpen(false);
-        } catch (error: any) {
-            setInviteError(error.message);
+        } catch (error) {
+            
             alert(`Error sending invitation: ${error.message}`);
         } finally {
             setInviteLoading(false);

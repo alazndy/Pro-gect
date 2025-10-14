@@ -11,23 +11,12 @@ interface SettingsProps {
   onThemeChange: (theme: 'light' | 'dark') => void;
 }
 
-// A reusable toggle switch component
-const ToggleSwitch: React.FC<{ enabled: boolean; onChange: (enabled: boolean) => void }> = ({ enabled, onChange }) => {
-  return (
-    <button
-      onClick={() => onChange(!enabled)}
-      className={`${
-        enabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
-      } relative inline-flex h-6 w-11 items-center rounded-full transition-colors`}
-    >
-      <span
-        className={`${
-          enabled ? 'translate-x-6' : 'translate-x-1'
-        } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
-      />
-    </button>
-  );
-};
+const themes = [
+    { name: 'dark', label: 'Koyu' },
+    { name: 'light', label: 'Açık' },
+    { name: 'sunset', label: 'Gün Batımı' },
+    { name: 'ocean', label: 'Okyanus' },
+];
 
 const Settings: React.FC<SettingsProps> = ({ user, currentTheme, onThemeChange }) => {
   const [profile, setProfile] = useState({
@@ -102,10 +91,9 @@ const Settings: React.FC<SettingsProps> = ({ user, currentTheme, onThemeChange }
                     <div className="p-6">
                         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Görünüm</h2>
                          <div className="flex space-x-2">
-                            <button onClick={() => onThemeChange('light')} className={`w-full p-3 rounded-lg border-2 transition-colors ${currentTheme === 'light' ? 'border-blue-500 bg-blue-500/10' : 'border-transparent bg-gray-200 dark:bg-gray-700'}`}>Açık</button>
-                            <button onClick={() => onThemeChange('dark')} className={`w-full p-3 rounded-lg border-2 transition-colors ${currentTheme === 'dark' ? 'border-blue-500 bg-blue-500/20' : 'border-transparent bg-gray-200 dark:bg-gray-700'}`}>Koyu</button>
-                         </div>
-                    </div>
+                             <button onClick={() => onThemeChange('light')} className={`w-full p-3 rounded-lg border-2 transition-colors ${currentTheme === 'light' ? 'border-blue-500 bg-blue-500/10' : 'border-transparent bg-gray-200 dark:bg-gray-700'}`}>Açık</button>
+                             <button onClick={() => onThemeChange('dark')} className={`w-full p-3 rounded-lg border-2 transition-colors ${currentTheme === 'dark' ? 'border-blue-500 bg-blue-500/20' : 'border-transparent bg-gray-200 dark:bg-gray-700'}`}>Koyu</button>
+                         </div>                    </div>
                 </Card>
 
                 {/* Notifications Card */}

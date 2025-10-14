@@ -51,7 +51,7 @@ const GoalEditorCard: React.FC<{
     };
 
     return (
-        <Card glowColor={meta.color as any}>
+        <Card glowColor={meta.color}>
             <div className={`p-6 border-l-4 ${colorClasses[meta.color]}`}>
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white">{meta.label}</h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 mb-3">{meta.description}</p>

@@ -5,7 +5,7 @@ import React, { useMemo } from 'react';
 // Fix: Removed .ts extension from import path.
 import type { Task } from '../types.ts';
 import Card from './Card.tsx';
-import { formatDistanceToNow, isPast, isWithinInterval, addDays } from 'date-fns';
+import { formatDistanceToNow, isWithinInterval, addDays } from 'date-fns';
 import { tr } from 'date-fns/locale';
 
 interface TaskCardProps {

@@ -9,14 +9,14 @@ interface SidebarProps {
     hasProject: boolean;
 }
 
-const SidebarIcon: React.FC<{ Icon: React.FC<any>, active: boolean }> = ({ Icon, active }) => (
+const SidebarIcon: React.FC<{ Icon: React.FC<React.SVGProps<SVGSVGElement>>, active: boolean }> = ({ Icon, active }) => (
     <Icon className={`w-6 h-6 transition-colors ${active ? 'text-white' : 'text-gray-400 group-hover:text-white'}`} />
 );
 
 const NavItem: React.FC<{
     page: Page;
     label: string;
-    icon: React.FC<any>;
+    icon: React.FC<React.SVGProps<SVGSVGElement>>;
     currentPage: Page;
     onNavigate: (page: Page) => void;
     disabled?: boolean;

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Card from './Card.tsx';
+
 import type { Project, User, SmartGoals, Scope, Integration, IntegrationCategory, Role } from '../types.ts';
 import { SOFTWARE_PLATFORMS, HARDWARE_PLATFORMS } from '../constants.tsx';
 import UserAvatar from './UserAvatar.tsx';
@@ -13,18 +13,18 @@ interface ProjectWizardProps {
 }
 
 const steps = [
-    { id: 1, name: 'Detaylar', icon: (p: any) => <svg {...p} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg> },
-    { id: 2, name: 'Takım', icon: (p: any) => <svg {...p} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m-7.5-2.952a4.5 4.5 0 01-9 0m9 0a4.5 4.5 0 00-9 0m9 0h.008v.008h-.008v-.008zm-9 0h.008v.008H9v-.008zm7.5-9a4.5 4.5 0 019 0m-9 0a4.5 4.5 0 009 0m-9 0h.008v.008h-.008V9.72z" /></svg> },
-    { id: 3, name: 'Kapsam', icon: (p: any) => <svg {...p} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75l3 3m0 0l3-3m-3 3v-7.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> },
-    { id: 4, name: 'Hedefler', icon: (p: any) => <svg {...p} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 18.75h-9a9.75 9.75 0 100-13.5h9a9.75 9.75 0 100 13.5z" /><path strokeLinecap="round" strokeLinejoin="round" d="M12 12.75h.008v.008H12v-.008z" /></svg> },
-    { id: 5, name: 'Bütçe', icon: (p: any) => <svg {...p} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.75A.75.75 0 013 4.5h.75m0 0h.75A.75.75 0 015.25 6v.75m0 0v.75a.75.75 0 01-.75.75h-.75a.75.75 0 01-.75-.75V7.5m1.5-1.5h.75a.75.75 0 01.75.75v.75m0 0v.75a.75.75 0 01-.75.75h-.75a.75.75 0 01-.75-.75V7.5m-6 3V7.5m0 0A.75.75 0 013 6h.75M3.75 9v6m0 0a.75.75 0 01-.75.75h-.75a.75.75 0 01-.75-.75V9m0 0h.75A.75.75 0 013.75 9z" /></svg> },
-    { id: 6, name: 'Entegrasyonlar', icon: (p: any) => <svg {...p} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" /></svg> },
-    { id: 7, name: 'Platformlar', icon: (p: any) => <svg {...p} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" /></svg> },
-    { id: 8, name: 'AI Agent', icon: (p: any) => <svg {...p} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M8.25 19.5V21M12 3v1.5m0 15V21m3.75-18v1.5m0 15V21m-9-1.5h10.5a2.25 2.25 0 002.25-2.25V8.25a2.25 2.25 0 00-2.25-2.25H6.75A2.25 2.25 0 004.5 8.25v10.5A2.25 2.25 0 006.75 21z" /></svg> },
-    { id: 9, name: 'Gözden Geçir', icon: (p: any) => <svg {...p} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> },
+    { id: 1, name: 'Detaylar', icon: (p: React.SVGProps<SVGSVGElement>) => <svg {...p} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg> },
+    { id: 2, name: 'Takım', icon: (p: React.SVGProps<SVGSVGElement>) => <svg {...p} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m-7.5-2.952a4.5 4.5 0 01-9 0m9 0a4.5 4.5 0 00-9 0m9 0h.008v.008h-.008v-.008zm-9 0h.008v.008H9v-.008zm7.5-9a4.5 4.5 0 019 0m-9 0a4.5 4.5 0 009 0m-9 0h.008v.008h-.008V9.72z" /></svg> },
+    { id: 3, name: 'Kapsam', icon: (p: React.SVGProps<SVGSVGElement>) => <svg {...p} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75l3 3m0 0l3-3m-3 3v-7.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> },
+    { id: 4, name: 'Hedefler', icon: (p: React.SVGProps<SVGSVGElement>) => <svg {...p} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 18.75h-9a9.75 9.75 0 100-13.5h9a9.75 9.75 0 100 13.5z" /><path strokeLinecap="round" strokeLinejoin="round" d="M12 12.75h.008v.008H12v-.008z" /></svg> },
+    { id: 5, name: 'Bütçe', icon: (p: React.SVGProps<SVGSVGElement>) => <svg {...p} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.75A.75.75 0 013 4.5h.75m0 0h.75A.75.75 0 015.25 6v.75m0 0v.75a.75.75 0 01-.75.75h-.75a.75.75 0 01-.75-.75V7.5m1.5-1.5h.75a.75.75 0 01.75.75v.75m0 0v.75a.75.75 0 01-.75.75h-.75a.75.75 0 01-.75-.75V7.5m-6 3V7.5m0 0A.75.75 0 013 6h.75M3.75 9v6m0 0a.75.75 0 01-.75.75h-.75a.75.75 0 01-.75-.75V9m0 0h.75A.75.75 0 013.75 9z" /></svg> },
+    { id: 6, name: 'Entegrasyonlar', icon: (p: React.SVGProps<SVGSVGElement>) => <svg {...p} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" /></svg> },
+    { id: 7, name: 'Platformlar', icon: (p: React.SVGProps<SVGSVGElement>) => <svg {...p} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" /></svg> },
+    { id: 8, name: 'AI Agent', icon: (p: React.SVGProps<SVGSVGElement>) => <svg {...p} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M8.25 19.5V21M12 3v1.5m0 15V21m3.75-18v1.5m0 15V21m-9-1.5h10.5a2.25 2.25 0 002.25-2.25V8.25a2.25 2.25 0 00-2.25-2.25H6.75A2.25 2.25 0 004.5 8.25v10.5A2.25 2.25 0 006.75 21z" /></svg> },
+    { id: 9, name: 'Gözden Geçir', icon: (p: React.SVGProps<SVGSVGElement>) => <svg {...p} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> },
 ];
 
-const WizardStep: React.FC<{ Icon: React.FC<any>, label: string, active: boolean, completed: boolean, onClick: () => void }> = ({ Icon, label, active, completed, onClick }) => (
+const WizardStep: React.FC<{ Icon: React.FC<React.SVGProps<SVGSVGElement>>, label: string, active: boolean, completed: boolean, onClick: () => void }> = ({ Icon, label, active, completed, onClick }) => (
     <div onClick={onClick} className={`flex items-center space-x-4 p-3 rounded-lg cursor-pointer transition-all duration-300 ${active ? 'bg-blue-500/20 scale-105' : 'hover:bg-white/10'}`}>
         <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${active ? 'border-blue-400 text-blue-300' : completed ? 'border-green-500 text-green-400' : 'border-gray-600 text-gray-500'}`}>
             <Icon className="w-6 h-6" />
@@ -65,7 +65,7 @@ const ProjectWizard: React.FC<ProjectWizardProps> = ({ currentUser, allUsers, al
     });
     const [nameError, setNameError] = useState('');
 
-    const handleDataChange = (field: keyof typeof projectData, value: any) => {
+    const handleDataChange = (field: keyof typeof projectData, value: unknown) => {
         if (field === 'name') {
             if (!value.trim()) setNameError('Proje adı gerekli.');
             else setNameError('');
@@ -289,7 +289,7 @@ const ProjectWizard: React.FC<ProjectWizardProps> = ({ currentUser, allUsers, al
                             </div>
                         </div>;
 
-                    case 2: // Team
+                    case 2: { // Team
                         const availableToSelect = allUsers.filter(u => u.id !== currentUser.id);
                         return <div className="space-y-4">
                             <div>
@@ -319,6 +319,7 @@ const ProjectWizard: React.FC<ProjectWizardProps> = ({ currentUser, allUsers, al
                                 </select>
                             </div>
                         </div>;
+                    }
                     case 3: // Scope
                         return <div className="space-y-4">
                             <FormTextarea label="Kapsam Dahili (In-Scope)" value={projectData.scope.inScope} onChange={(e) => handleScopeChange('inScope', e.target.value)} placeholder="- Gerçek zamanlı veri görselleştirme" />

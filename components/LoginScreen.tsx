@@ -23,8 +23,12 @@ const LoginScreen: React.FC = () => {
         try {
             await signInWithPopup(auth, provider);
             // App.tsx will handle the redirect on successful login
-        } catch (error: any) {
-            setError(error.message);
+} catch (error: unknown) {
+            if (error instanceof Error) {
+                setError(error.message);
+            } else {
+                setError("An unknown error occurred during Google sign-in.");
+            }
             setLoading(false);
         }
     };
@@ -35,12 +39,12 @@ const LoginScreen: React.FC = () => {
         setError(null);
         try {
             await signInWithEmailAndPassword(auth, email, password);
-        } catch (error: any) {
+        } catch (error) {
             if (error.code === 'auth/user-not-found') {
                 // If user not found, try to create a new account
                 try {
                     await createUserWithEmailAndPassword(auth, email, password);
-                } catch (signupError: any) {
+                } catch (signupError) {
                     setError(signupError.message);
                 }
             } else {

@@ -1,7 +1,7 @@
 
 import React from 'react';
 // Fix: Corrected module imports by removing file extensions and adjusting paths for components directory.
-import type { Project, User, Task, Expense, Page } from '../types.ts';
+import type { Project, User, Expense, Page } from '../types.ts';
 import { USERS } from '../constants.tsx';
 import TaskCard from './TaskCard.tsx';
 import BudgetCard from './BudgetCard.tsx';
@@ -15,7 +15,7 @@ import DocumentsCard from './DocumentsCard.tsx';
 
 interface DashboardProps {
     project: Project;
-    currentUser: User;
+    
     onUpdateProject: (updatedProject: Project) => void;
     dashboardView: string;
     onSetDashboardView: (view: string) => void;
@@ -24,7 +24,7 @@ interface DashboardProps {
     onNavigate: (page: Page) => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ project, currentUser, onUpdateProject, dashboardView, onSetDashboardView, onAddExpense, onRemoveExpense, onNavigate }) => {
+const Dashboard: React.FC<DashboardProps> = ({ project, onUpdateProject, dashboardView, onSetDashboardView, onAddExpense, onRemoveExpense, onNavigate }) => {
     
     // Handlers for child components to update project state
     const handleChangeAdmin = (newAdminId: string) => {

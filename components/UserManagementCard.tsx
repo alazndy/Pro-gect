@@ -1,5 +1,5 @@
 import React from 'react';
-import { ProjectMember, User, Role } from '../types';
+import { User, Role } from '../types';
 import Card from './Card';
 import UserAvatar from './UserAvatar';
 

@@ -4,11 +4,15 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --port 5173",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint": "cross-env ESLINT_USE_FLAT_CONFIG=false eslint . --ext .ts,.tsx --fix",
+    "start:all": "concurrently \"npm:dev\" \"npm:start --prefix backend\" \"npm:start --prefix backend-nodered\" \"npm:dev --prefix api-server\""
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "@xyflow/react": "^12.8.6",
     "date-fns": "^4.1.0",
     "firebase": "^12.4.0",
     "react": "^19.2.0",
@@ -16,7 +20,13 @@
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
+    "@typescript-eslint/eslint-plugin": "^8.46.1",
+    "@typescript-eslint/parser": "^8.46.1",
     "@vitejs/plugin-react": "^5.0.0",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
+    "eslint": "^9.37.0",
+    "eslint-plugin-react": "^7.37.5",
     "typescript": "~5.8.2",
     "vite": "^6.2.0"
   }

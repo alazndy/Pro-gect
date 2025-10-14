@@ -53,7 +53,7 @@ const GanttChartView: React.FC<GanttChartViewProps> = ({ tasks, onOpenTaskDetail
                     </div>
                     {/* Body */}
                     <div className="relative">
-                        {tasksWithDates.map((task, index) => {
+                        {tasksWithDates.map((task) => {
                             const startDate = parseISO(task.startDate!);
                             const endDate = parseISO(task.dueDate!);
                             const startOffset = differenceInDays(startDate, projectStartDate);
